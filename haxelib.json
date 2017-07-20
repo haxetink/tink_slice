@@ -1,0 +1,19 @@
+{
+  "name": "tink_slice",
+  "license": "MIT",
+  "tags": [
+    "tink",
+    "ds",
+    "slice"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "back2dos"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "url": "https://github.com/haxetink/tink_slice/",
+  "dependencies": {
+    "tink_core": ""
+  }
+}
