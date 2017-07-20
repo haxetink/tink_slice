@@ -33,7 +33,7 @@ private class SliceData<T> {
 }
 
 abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
-
+  ///If the slice is shared, its entries may change over time, otherwise it is immutable
   public var isShared(get, never):Bool;
     inline function get_isShared()
       return this.isShared;
@@ -42,6 +42,7 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
     inline function get_length()
       return this.length;
 
+  ///Because the slice represents only a part of the data it references, it may in fact have a big overhead
   public function getOverhead()
     return 
       switch this.entries.length {
@@ -49,6 +50,7 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
         case v: (v - length) / length;
       }
 
+  ///Compacting a slice returns a slice that has no overhead and is not shared. May therefore return the slice itself.
   public function compact():Slice<T>
     return 
       if (isShared || this.entries.length > length)
@@ -59,10 +61,12 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
         }, 0, length, false, this.reversed);
       else this;
 
+  ///Returns the reverse slice. Note that this is cached, so `slice.reverse().reverse() == slice`
   public inline function reverse():Slice<T>
     return this.reverse;
 
-  public function peel()
+  ///Decomposes the slice into head and tail for fans of functional programming
+  public function peel():Null<Pair<T, Slice<T>>>
     return 
       if (this.length == 0) null;
       else new Pair(this.entries[this.start], skip(1));
@@ -81,19 +85,21 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
   public inline function iterator()
     return new SliceIterator(this.entries, this.start, this.length, this.reversed);
 
+  ///If count is negative, the original slice is returned, if it exceeds length, an empty slice is returned
   public function skip(count):Slice<T> 
     return 
       if (count > length) empty();
       else if (count <= 0) this;
       else make(this.entries, if (this.reversed) this.start else this.start + count, length - count, this.isShared, this.reversed);
 
+  ///If count is negative, the original slice is returned, if it exceeds length, an empty slice is returned
   public function limit(count):Slice<T> 
     return 
       if (count > length) empty();
       else if (count <= 0) this;
       else make(this.entries, if (this.reversed) this.start + length - count else this.start, count, this.isShared, this.reversed);  
 
-  static public inline function make<T>(vec:Vector<T>, start:Int, length:Int, isShared:Bool, reversed:Bool = false):Slice<T> 
+  static inline function make<T>(vec:Vector<T>, start:Int, length:Int, isShared:Bool, reversed:Bool = false):Slice<T> 
     return new SliceData<T>(vec, reversed, start, length, isShared);
 
   static public inline function withinVector<T>(vec:Vector<T>, start:Int, length:Int) 
@@ -127,7 +133,7 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
     return make(vec, 0, count, false);
   }
 
-  @:from static public function ofSingle<T>(x:T)
+  @:from static public function ofSingleEntry<T>(x:T)
     return make({ 
       var vec = new Vector(1); 
       vec[0] = x;
@@ -135,7 +141,7 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
     }, 0, 1, false, false);
 }
 
-class SliceIterator<T> {
+private class SliceIterator<T> {
   var pos:Int;
   var step:Int;
   var left:Int;
