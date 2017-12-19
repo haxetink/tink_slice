@@ -32,7 +32,7 @@ private class SliceData<T> {
 
 }
 
-abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
+abstract Slice<T>(SliceData<T>) from SliceData<T> {
   ///If the slice is shared, its entries may change over time, otherwise it is immutable
   public var isShared(get, never):Bool;
     inline function get_isShared()
@@ -139,6 +139,9 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
       vec[0] = x;
       vec;
     }, 0, 1, false, false);
+
+  @:to function toIterable():Iterable<T>
+    return this;
 }
 
 private class SliceIterator<T> {
