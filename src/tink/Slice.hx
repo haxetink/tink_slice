@@ -96,7 +96,7 @@ abstract Slice<T>(SliceData<T>) from SliceData<T> {
   public function limit(count):Slice<T> 
     return 
       if (count > length) empty();
-      else if (count <= 0) this;
+      else if (count < 0) this;
       else make(this.entries, if (this.reversed) this.start + length - count else this.start, count, this.isShared, this.reversed);  
 
   static inline function make<T>(vec:Vector<T>, start:Int, length:Int, isShared:Bool, reversed:Bool = false):Slice<T> 
