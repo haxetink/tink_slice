@@ -1,19 +1,19 @@
 {
 	"name": "tink_slice",
-	"license": "MIT",
+	"classPath": "src",
+	"dependencies": {
+		"tink_core": ""
+	},
+	"url": "https://github.com/haxetink/tink_slice/",
+	"contributors": [
+		"back2dos"
+	],
+	"version": "0.2.0",
+	"releasenote": "Support for Java and C#",
 	"tags": [
 		"tink",
 		"ds",
 		"slice"
 	],
-	"classPath": "src",
-	"contributors": [
-		"back2dos"
-	],
-	"releasenote": "Initial haxelib release.",
-	"version": "0.1.0",
-	"url": "https://github.com/haxetink/tink_slice/",
-	"dependencies": {
-		"tink_core": ""
-	}
+	"license": "MIT"
 }
