@@ -1,6 +1,5 @@
 package tink;
 
-import haxe.ds.Vector;
 using tink.CoreApi;
 
 @:structInit
@@ -174,3 +173,50 @@ private class SliceIterator<T> {
   }
 
 }
+
+#if (java || cs)
+@:forward(length)
+private abstract Vector<T>(Array<T>) {
+  public function new(length) {
+    this = new Array();
+    this.resize(length);
+  }
+
+  @:arrayAccess inline function get(index)
+    return this[index];
+
+  @:arrayAccess inline function set(index, value)
+    return this[index] = value;
+
+  static public function fromArrayCopy<T>(a:Array<T>):Vector<T>
+    return cast a.copy();
+
+  static public function blit<T>(src:Vector<T>, srcPos:Int, dest:Vector<T>, destPos:Int, len:Int):Void {
+    if (src == dest) {
+      if (srcPos < destPos) {
+        var i = srcPos + len;
+        var j = destPos + len;
+        for (k in 0...len) {
+          i--;
+          j--;
+          src[j] = src[i];
+        }
+      } else if (srcPos > destPos) {
+        var i = srcPos;
+        var j = destPos;
+        for (k in 0...len) {
+          src[j] = src[i];
+          i++;
+          j++;
+        }
+      }
+    } else {
+      for (i in 0...len) {
+        dest[destPos + i] = src[srcPos + i];
+      }
+    }
+  }
+}
+#else
+private typedef Vector<T> = haxe.ds.Vector<T>;
+#end

@@ -28,6 +28,7 @@ script:
   - lix travix python
   - lix travix cpp
   - lix travix java -D jvm
+  - lix travix cs
   - lix run travix php
 
 jobs:
