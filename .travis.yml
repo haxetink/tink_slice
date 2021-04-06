@@ -1,43 +1,47 @@
 sudo: required
-dist: trusty
+dist: xenial
 
-language: haxe
+stages:
+  - test
+  - deploy
+
+language: node_js
+node_js: 8
 
 os:
   - linux
-  
-haxe:
-  - "3.4.2"
-  - development
-  
-matrix:
-  allow_failures:
-    - haxe: development
-    
-install:
-  - haxelib install travix
-  - haxelib run travix install
-
-script:
-  - haxelib run travix interp
-  - haxelib run travix neko
-  - haxelib run travix python
-  - haxelib run travix node
-  - haxelib run travix js
-  #- haxelib run travix flash
-  #- haxelib run travix java # type parameter foobar prevents this from working
-  - haxelib run travix cpp
-  - haxelib run travix cs
-  - haxelib run travix php
-  - haxelib run travix lua
+  # - osx
 
 env:
-  - secure: "RGVmNvjpELxB4+upCuFcOdeIfeW5sRr5FTLKfNZUy4TFFi88d9DhyLsLxg6B3Nnd0+mq2TzhY3knFo/ZiIG499LobQeKUxMgmrhDD9v38sSNGB6qcUbPLxNcgNUMEM2nblJlhww6WDuebS4fNF/5nzhI18tr7EXMRD9O274aOpxkBVU/jC5Tlxs7YvOUyr75oQHppDffZFuipc/fEBohVHEw4uhjeTfNLV0rQi57KrhrUVk7JB1tgMwv4XT8nkTch1lwf/uWFqnB7O9hVLpBDCmdO8dayl4pNoE64RX+uRFDKBGNdSN46XZ+WzgX8qn3Ntv88SkkcaK8mnibsyZOS7Hm40NG34EF4w6DM1vP13sLt1dzctIEjDYpU+Z3tqiPv8Ldmi1Qdb8R8nrAMXPhmYbetJ/UHdyPCTMDWHvThfyETSiQhx2eFYcZxzGo437865nQYnR56yoIu5RZIkr1b1ogsGYVcOUtdSyqXawv4wkg/p8SihhvwTh0QCim/nqbRilMgshsLdgcyAQh3Rgx7p8XVT5SDOurrdFfjl5lEDrlkWCoJ7jGblQkJns4emfqi6vinA0d6RJCgtdo6E9Vg17bcMfrZlhjxyk0vLijZ8Yz6/L33UbeRmBrLzY/mHhh/UYx82KeEaXLXGZL4PXXtMjHah4Y90du/J8vCAjOPnc="
+  - HAXE_VERSION=stable
+  - HAXE_VERSION=latest
+
+install:
+  - npm i -g lix
+  - lix install haxe $HAXE_VERSION
+  - lix download
+
+script:
+  - lix travix interp
+  - lix travix neko
+  - lix travix node
+  - lix travix python
+  - lix travix cpp
+  - lix travix java -D jvm
+  - lix run travix php
 
 jobs:
   include:
+    # - stage: test # should uncomment this when there is no matrix above (e.g. only one os, one env, etc)
     - stage: deploy
+      language: haxe
+      haxe: "3.4.7"
       os: linux
-      haxe: "3.4.2"
+      install: skip
       script: skip
-      after_success: haxelib run travix release
+      env:
+        - secure: "RGVmNvjpELxB4+upCuFcOdeIfeW5sRr5FTLKfNZUy4TFFi88d9DhyLsLxg6B3Nnd0+mq2TzhY3knFo/ZiIG499LobQeKUxMgmrhDD9v38sSNGB6qcUbPLxNcgNUMEM2nblJlhww6WDuebS4fNF/5nzhI18tr7EXMRD9O274aOpxkBVU/jC5Tlxs7YvOUyr75oQHppDffZFuipc/fEBohVHEw4uhjeTfNLV0rQi57KrhrUVk7JB1tgMwv4XT8nkTch1lwf/uWFqnB7O9hVLpBDCmdO8dayl4pNoE64RX+uRFDKBGNdSN46XZ+WzgX8qn3Ntv88SkkcaK8mnibsyZOS7Hm40NG34EF4w6DM1vP13sLt1dzctIEjDYpU+Z3tqiPv8Ldmi1Qdb8R8nrAMXPhmYbetJ/UHdyPCTMDWHvThfyETSiQhx2eFYcZxzGo437865nQYnR56yoIu5RZIkr1b1ogsGYVcOUtdSyqXawv4wkg/p8SihhvwTh0QCim/nqbRilMgshsLdgcyAQh3Rgx7p8XVT5SDOurrdFfjl5lEDrlkWCoJ7jGblQkJns4emfqi6vinA0d6RJCgtdo6E9Vg17bcMfrZlhjxyk0vLijZ8Yz6/L33UbeRmBrLzY/mHhh/UYx82KeEaXLXGZL4PXXtMjHah4Y90du/J8vCAjOPnc="
+      after_success:
+        - haxelib install travix
+        - haxelib run travix install
+        - haxelib run travix release
