@@ -31,7 +31,7 @@ private class SliceData<T> {
 
 }
 
-abstract Slice<T>(SliceData<T>) from SliceData<T> {
+abstract Slice<T>(SliceData<T>) from SliceData<T> to Iterable<T> {
   ///If the slice is shared, its entries may change over time, otherwise it is immutable
   public var isShared(get, never):Bool;
     inline function get_isShared()
